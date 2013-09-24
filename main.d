@@ -25,6 +25,8 @@ main() {
 	log.d("Depuración con método abreviado.");
 	log.trace("Esto es una línea de depuración pero a más bajo nivel.");
 	log.t("Trace con método abreviado.");
+	log.t("Trace con valores: %d, %d", 42, 69);
+	log.t("Con array: [%(%d, %)]", [1, 2, 3]);
 
 	return 0;
 }
