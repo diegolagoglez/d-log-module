@@ -1,6 +1,8 @@
 module log;
 
 import std.stdio;
+import std.format;
+import std.array;
 
 class Log {
 	public:
@@ -90,6 +92,12 @@ class Log {
 			doLog(new Record(message, severity, this.fFacility));
 		}
 		
+		string buildMessage(Args...)(Args args) {
+			auto writer = appender!string();
+			formattedWrite(writer, args);
+			return writer.data;
+		}
+		
 	public:
 		this() {}
 		
@@ -109,41 +117,63 @@ class Log {
 			return fFacility;
 		}
 		
-		void emergency(lazy string message) {
+		void emergency(string)(lazy string message) {
 			doLog(message, Severity.Emergency);
 		}
+		
+		void emergency(Args...)(Args args) {
+			doLog(buildMessage(args), Severity.Emergency);
+		}
+		
+		alias em = emergency;
 		
 		void alert(lazy string message) {
 			doLog(message, Severity.Alert);
 		}
 		
+		alias a = alert;
+		
 		void critical(lazy string message) {
 			doLog(message, Severity.Critical);
 		}
+		
+		alias c = critical;
 		
 		void error(lazy string message) {
 			doLog(message, Severity.Error);
 		}
 		
+		alias e = error;
+		
 		void warning(lazy string message) {
 			doLog(message, Severity.Warning);
 		}
+		
+		alias w = warning;
 		
 		void notice(lazy string message) {
 			doLog(message, Severity.Notice);
 		}
 		
+		alias n = notice;
+		
 		void info(lazy string message) {
 			doLog(message, Severity.Info);
 		}
+		
+		alias i = info;
 		
 		void dbg(lazy string message) {
 			doLog(message, Severity.Debug);
 		}
 		
+		alias d = dbg;
+		
 		void trace(lazy string message) {
 			doLog(message, Severity.Trace);
 		}
+		
+		alias t = trace;
 }
 
 class LogWriter {
