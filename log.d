@@ -127,44 +127,72 @@ class Log {
 		
 		alias em = emergency;
 		
-		void alert(lazy string message) {
+		void alert(string)(lazy string message) {
 			log(message, Severity.Alert);
+		}
+		
+		void alert(Args...)(Args args) {
+			log(buildMessage(args), Severity.Alert);
 		}
 		
 		alias a = alert;
 		
-		void critical(lazy string message) {
+		void critical(string)(lazy string message) {
 			log(message, Severity.Critical);
+		}
+		
+		void critical(Args...)(Args args) {
+			log(buildMessage(args), Severity.Critical);
 		}
 		
 		alias c = critical;
 		
-		void error(lazy string message) {
+		void error(string)(lazy string message) {
 			log(message, Severity.Error);
+		}
+		
+		void error(Args...)(Args args) {
+			log(buildMessage(args), Severity.Error);
 		}
 		
 		alias e = error;
 		
-		void warning(lazy string message) {
+		void warning(string)(lazy string message) {
 			log(message, Severity.Warning);
+		}
+		
+		void warning(Args...)(Args args) {
+			log(buildMessage(args), Severity.Warning);
 		}
 		
 		alias w = warning;
 		
-		void notice(lazy string message) {
+		void notice(string)(lazy string message) {
 			log(message, Severity.Notice);
+		}
+		
+		void notice(Args...)(Args args) {
+			log(buildMessage(args), Severity.Notice);
 		}
 		
 		alias n = notice;
 		
-		void info(lazy string message) {
+		void info(string)(lazy string message) {
 			log(message, Severity.Info);
+		}
+		
+		void info(Args...)(Args args) {
+			log(buildMessage(args), Severity.Info);
 		}
 		
 		alias i = info;
 		
-		void dbg(lazy string message) {
+		void dbg(string)(lazy string message) {
 			log(message, Severity.Debug);
+		}
+		
+		void dbg(Args...)(Args args) {
+			log(buildMessage(args), Severity.Debug);
 		}
 		
 		alias d = dbg;
