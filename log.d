@@ -82,17 +82,17 @@ class Log {
 		LogWriter[]		fWriters;
 		Facility		fFacility = Facility.User;
 		
-		void doLog(Record record) {
+		void writeRecord(Record record) {
 			foreach(writer; fWriters) {
 				writer.doLog(record);
 			}
 		}
 		
 		void doLog(lazy string message, Severity severity) {
-			doLog(new Record(message, severity, this.fFacility));
+			writeRecord(new Record(message, severity, this.fFacility));
 		}
 		
-		string buildMessage(Args...)(Args args) {
+		string buildMessage(Args...)(lazy Args args) {
 			auto writer = appender!string();
 			formattedWrite(writer, args);
 			return writer.data;
@@ -169,8 +169,12 @@ class Log {
 		
 		alias d = dbg;
 		
-		void trace(lazy string message) {
+		void trace(string)(lazy string message) {
 			doLog(message, Severity.Trace);
+		}
+		
+		void trace(Args...)(lazy Args args) {
+			doLog(buildMessage(args), Severity.Trace);
 		}
 		
 		alias t = trace;
