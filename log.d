@@ -84,11 +84,11 @@ class Log {
 		
 		void writeRecord(Record record) {
 			foreach(writer; fWriters) {
-				writer.doLog(record);
+				writer.log(record);
 			}
 		}
 		
-		void doLog(lazy string message, Severity severity) {
+		void log(lazy string message, Severity severity) {
 			writeRecord(new Record(message, severity, this.fFacility));
 		}
 		
@@ -118,63 +118,63 @@ class Log {
 		}
 		
 		void emergency(string)(lazy string message) {
-			doLog(message, Severity.Emergency);
+			log(message, Severity.Emergency);
 		}
 		
 		void emergency(Args...)(Args args) {
-			doLog(buildMessage(args), Severity.Emergency);
+			log(buildMessage(args), Severity.Emergency);
 		}
 		
 		alias em = emergency;
 		
 		void alert(lazy string message) {
-			doLog(message, Severity.Alert);
+			log(message, Severity.Alert);
 		}
 		
 		alias a = alert;
 		
 		void critical(lazy string message) {
-			doLog(message, Severity.Critical);
+			log(message, Severity.Critical);
 		}
 		
 		alias c = critical;
 		
 		void error(lazy string message) {
-			doLog(message, Severity.Error);
+			log(message, Severity.Error);
 		}
 		
 		alias e = error;
 		
 		void warning(lazy string message) {
-			doLog(message, Severity.Warning);
+			log(message, Severity.Warning);
 		}
 		
 		alias w = warning;
 		
 		void notice(lazy string message) {
-			doLog(message, Severity.Notice);
+			log(message, Severity.Notice);
 		}
 		
 		alias n = notice;
 		
 		void info(lazy string message) {
-			doLog(message, Severity.Info);
+			log(message, Severity.Info);
 		}
 		
 		alias i = info;
 		
 		void dbg(lazy string message) {
-			doLog(message, Severity.Debug);
+			log(message, Severity.Debug);
 		}
 		
 		alias d = dbg;
 		
 		void trace(string)(lazy string message) {
-			doLog(message, Severity.Trace);
+			log(message, Severity.Trace);
 		}
 		
 		void trace(Args...)(lazy Args args) {
-			doLog(buildMessage(args), Severity.Trace);
+			log(buildMessage(args), Severity.Trace);
 		}
 		
 		alias t = trace;
@@ -213,7 +213,7 @@ class LogWriter {
 		
 		~this() {}
 		
-		abstract void doLog(Log.Record record);
+		abstract void log(Log.Record record);
 		
 }
 
@@ -223,7 +223,7 @@ class ConsoleLogWriter : LogWriter {
 		return "[" ~ severityToString(record.severity()) ~ "] " ~ record.message();
 	}
 	
-	override public void doLog(Log.Record record) {
+	override public void log(Log.Record record) {
 		recordToString(record).writeln;
 	}
 	
