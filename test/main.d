@@ -1,6 +1,6 @@
 import std.stdio;
 
-import log;
+import log.logger;
 
 int
 main() {
