@@ -7,10 +7,8 @@ class LogWriter {
 	private		bool			fUseParentSeverity	= true;
 	private		Logger			fParentLogger		= null;
 	
-	private void checkParent() {
-		if(fParentLogger is null) {
-			throw new Exception("Log writer must belong to a Logger.");
-		}
+	private bool hasParent() {
+		return fParentLogger is null;
 	}
 
 	protected	Logger.Severity	fSeverity = Logger.Severity.Warning;
@@ -41,9 +39,10 @@ class LogWriter {
 		}
 	}
 	
+	// TODO Parametter constness attributes.
 	protected bool shouldLog(Logger.Record record) {
-		// TODO Parametter constness attributes.
-		return record.severity() <= (fUseParentSeverity ?  fParentLogger.severity() : fSeverity);
+		// Could LogWriters work outside a Logger?
+		return record.severity() <= (fUseParentSeverity ?  (hasParent() ? fParentLogger.severity() : fSeverity) : fSeverity);
 	}
 	
 	public {
