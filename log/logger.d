@@ -1,4 +1,4 @@
-module log;
+module logger;
 
 import std.stdio;
 import std.format;
