@@ -8,9 +8,9 @@ main() {
 	Logger log = new Logger(Logger.Severity.Trace);
 	log.addLogWriter(new ConsoleLogWriter());
 	
-	foreach(severity ; Logger.Severity.Emergency..Logger.Severity.Trace) {
-		severity.writeln;
-		log.setSeverity(severity);
+	foreach(severity; 0..9) {
+		(cast(Logger.Severity)severity).writeln;
+		log.setSeverity(cast(Logger.Severity)severity);
 		log.emergency("Esto es una emergencia.");
 		log.emergency("Esto es una emergencia con nombre: %s", "Juanito");
 		log.em("Emergencia con método abreviado.");
@@ -20,6 +20,8 @@ main() {
 		log.c("Error crítico con método abreviado.");
 		log.error("Esto es un error.");
 		log.e("Error con método abreviado.");
+		log.warning("Esto es un Warning.");
+		log.w("Warning con método abreviado.");
 		log.notice("Esto es algo que hay que tener en cuenta.");
 		log.n("Notice con método abreviado.");
 		log.info("Esto es información.");
