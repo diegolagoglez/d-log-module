@@ -1,8 +1,10 @@
-module logger;
+module log.logger;
 
 import std.stdio;
 import std.format;
 import std.array;
+
+import log.writer;
 
 class Logger {
 
@@ -89,7 +91,7 @@ class Logger {
 		
 		// TODO Parametter constness attributes.
 		bool shouldLog(Logger.Record record, LogWriter writer) {
-			return !writer.fUseParentSeverity || record.severity() <= fSeverity;
+			return !writer.useParentSeverity() || record.severity() <= fSeverity;
 		}
 		
 		void writeRecord(Record record) {
@@ -125,7 +127,7 @@ class Logger {
 		
 		void addLogWriter(LogWriter writer) {
 			if(writer !is null) {
-				writer.fParentLogger = this;
+				writer.setParentLogger(this);
 				fWriters ~= writer;
 			}
 		}
@@ -236,105 +238,4 @@ class Logger {
 		
 		alias t = trace;
 	}
-}
-
-class LogWriter {
-
-	private		bool			fUseParentSeverity	= true;
-	private		Logger			fParentLogger		= null;
-	
-	private void checkParent() {
-		if(fParentLogger is null) {
-			throw new Exception("Log writer must belong to a Logger.");
-		}
-	}
-
-	protected	Logger.Severity	fSeverity = Logger.Severity.Warning;
-	protected	Logger.Facility	fFacility = Logger.Facility.User;
-
-	protected string severityToString(Logger.Severity severity) {
-		switch(severity) {
-			case Logger.Severity.Emergency:
-				return "emergency";
-			case Logger.Severity.Alert:
-				return "alert";
-			case Logger.Severity.Critical:
-				return "critical";
-			case Logger.Severity.Error:
-				return "error";
-			case Logger.Severity.Warning:
-				return "warning";
-			case Logger.Severity.Notice:
-				return "notice";
-			case Logger.Severity.Info:
-				return "info";
-			case Logger.Severity.Debug:
-				return "debug";
-			case Logger.Severity.Trace:
-				return "trace";
-			default:
-				return "unknown";
-		}
-	}
-	
-	protected bool shouldLog(Logger.Record record) {
-		// TODO Parametter constness attributes.
-		return record.severity() <= (fUseParentSeverity ?  fParentLogger.fSeverity : fSeverity);
-	}
-	
-	public {
-	
-		this() {}
-	
-		this(Logger.Severity severity, Logger.Facility facility = Logger.Facility.User) {
-			fSeverity = severity;
-			fUseParentSeverity = false;
-			fFacility = facility;
-		}
-		
-		~this() {}
-		
-		void setSeverity(Logger.Severity severity) {
-			fSeverity = severity;
-			fUseParentSeverity = false;
-		}
-		
-		Logger.Severity severity() {
-			return fSeverity;
-		}
-		
-		void setFacility(Logger.Facility facility) {
-			fFacility = facility;
-		}
-		
-		Logger.Facility facility() {
-			return fFacility;
-		}
-		
-		abstract void log(Logger.Record record);
-		
-	}
-		
-}
-
-class ConsoleLogWriter : LogWriter {
-
-	this() {
-		super();
-	}
-
-	this(Logger.Severity severity, Logger.Facility facility = Logger.Facility.User) {
-		super(severity, facility);
-	}
-
-	private string recordToString(Logger.Record record) {
-		return "[" ~ severityToString(record.severity()) ~ "] " ~ record.message();
-	}
-	
-	override public void log(Logger.Record record) {
-		if(shouldLog(record)) {
-			recordToString(record).writeln;
-		}
-	}
-	
 }
