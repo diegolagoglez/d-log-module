@@ -4,7 +4,7 @@ import std.stdio;
 import std.format;
 import std.array;
 
-class Log {
+class Logger {
 
 	public:
 	
@@ -85,9 +85,16 @@ class Log {
 		Severity		fSeverity = Severity.Debug;
 		Facility		fFacility = Facility.User;
 		
+		// TODO Parametter constness attributes.
+		bool shouldLog(Logger.Record record, LogWriter writer) {
+			return !writer.fUseParentSeverity || record.severity() <= fSeverity;
+		}
+		
 		void writeRecord(Record record) {
 			foreach(writer; fWriters) {
-				writer.log(record);
+				if(shouldLog(record, writer)) {
+					writer.log(record);
+				}
 			}
 		}
 		
@@ -105,6 +112,8 @@ class Log {
 		
 	public {
 	
+		this() {}
+	
 		this(Severity severity, LogWriter writer = null) {
 			fSeverity = severity;
 			addLogWriter(writer);
@@ -114,6 +123,7 @@ class Log {
 		
 		void addLogWriter(LogWriter writer) {
 			if(writer !is null) {
+				writer.fParentLogger = this;
 				fWriters ~= writer;
 			}
 		}
@@ -228,65 +238,78 @@ class Log {
 
 class LogWriter {
 
-	protected Log.Severity	fSeverity = Log.Severity.Debug;
-	protected Log.Facility	fFacility = Log.Facility.User;
+	private		bool			fUseParentSeverity	= true;
+	private		Logger			fParentLogger		= null;
+	
+	private void checkParent() {
+		if(fParentLogger is null) {
+			throw new Exception("Log writer must belong to a Logger.");
+		}
+	}
 
-	protected string severityToString(Log.Severity severity) {
+	protected	Logger.Severity	fSeverity = Logger.Severity.Warning;
+	protected	Logger.Facility	fFacility = Logger.Facility.User;
+
+	protected string severityToString(Logger.Severity severity) {
 		switch(severity) {
-			case Log.Severity.Emergency:
+			case Logger.Severity.Emergency:
 				return "emergency";
-			case Log.Severity.Alert:
+			case Logger.Severity.Alert:
 				return "alert";
-			case Log.Severity.Critical:
+			case Logger.Severity.Critical:
 				return "critical";
-			case Log.Severity.Error:
+			case Logger.Severity.Error:
 				return "error";
-			case Log.Severity.Warning:
+			case Logger.Severity.Warning:
 				return "warning";
-			case Log.Severity.Notice:
+			case Logger.Severity.Notice:
 				return "notice";
-			case Log.Severity.Info:
+			case Logger.Severity.Info:
 				return "info";
-			case Log.Severity.Debug:
+			case Logger.Severity.Debug:
 				return "debug";
-			case Log.Severity.Trace:
+			case Logger.Severity.Trace:
 				return "trace";
 			default:
 				return "unknown";
 		}
 	}
 	
-	protected bool shouldLog(Log.Record record) {
+	protected bool shouldLog(Logger.Record record) {
 		// TODO Parametter constness attributes.
-		return record.severity >= fSeverity;
+		return record.severity() <= (fUseParentSeverity ?  fParentLogger.fSeverity : fSeverity);
 	}
 	
 	public {
 	
-		this(Log.Severity severity, Log.Facility facility = Log.Facility.User) {
+		this() {}
+	
+		this(Logger.Severity severity, Logger.Facility facility = Logger.Facility.User) {
 			fSeverity = severity;
+			fUseParentSeverity = false;
 			fFacility = facility;
 		}
 		
 		~this() {}
 		
-		void setSeverity(Severity severity) {
+		void setSeverity(Logger.Severity severity) {
 			fSeverity = severity;
+			fUseParentSeverity = false;
 		}
 		
-		Severity severity() {
+		Logger.Severity severity() {
 			return fSeverity;
 		}
 		
-		void setFacility(Facility facility) {
+		void setFacility(Logger.Facility facility) {
 			fFacility = facility;
 		}
 		
-		Facility facility() {
+		Logger.Facility facility() {
 			return fFacility;
 		}
 		
-		abstract void log(Log.Record record);
+		abstract void log(Logger.Record record);
 		
 	}
 		
@@ -294,11 +317,15 @@ class LogWriter {
 
 class ConsoleLogWriter : LogWriter {
 
-	private string recordToString(Log.Record record) {
+	this(Logger.Severity severity, Logger.Facility facility = Logger.Facility.User) {
+		super(severity, facility);
+	}
+
+	private string recordToString(Logger.Record record) {
 		return "[" ~ severityToString(record.severity()) ~ "] " ~ record.message();
 	}
 	
-	override public void log(Log.Record record) {
+	override public void log(Logger.Record record) {
 		if(shouldLog(record)) {
 			recordToString(record).writeln;
 		}
