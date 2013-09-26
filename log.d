@@ -5,6 +5,7 @@ import std.format;
 import std.array;
 
 class Log {
+
 	public:
 	
 		enum Facility {
@@ -77,9 +78,11 @@ class Log {
 			}
 		}
 	
-	private:
+	private {
 	
 		LogWriter[]		fWriters;
+		
+		Severity		fSeverity = Severity.Debug;
 		Facility		fFacility = Facility.User;
 		
 		void writeRecord(Record record) {
@@ -98,8 +101,14 @@ class Log {
 			return writer.data;
 		}
 		
-	public:
-		this() {}
+	}
+		
+	public {
+	
+		this(Severity severity, LogWriter writer = null) {
+			fSeverity = severity;
+			addLogWriter(writer);
+		}
 		
 		~this() {}
 		
@@ -107,6 +116,14 @@ class Log {
 			if(writer !is null) {
 				fWriters ~= writer;
 			}
+		}
+		
+		void setSeverity(Severity severity) {
+			fSeverity = severity;
+		}
+		
+		Severity severity() {
+			return fSeverity;
 		}
 		
 		void setFacility(Facility facility) {
@@ -206,9 +223,13 @@ class Log {
 		}
 		
 		alias t = trace;
+	}
 }
 
 class LogWriter {
+
+	protected Log.Severity	fSeverity = Log.Severity.Debug;
+	protected Log.Facility	fFacility = Log.Facility.User;
 
 	protected string severityToString(Log.Severity severity) {
 		switch(severity) {
@@ -235,13 +256,39 @@ class LogWriter {
 		}
 	}
 	
-	public:
+	protected bool shouldLog(Log.Record record) {
+		// TODO Parametter constness attributes.
+		return record.severity >= fSeverity;
+	}
 	
-		this() {}
+	public {
+	
+		this(Log.Severity severity, Log.Facility facility = Log.Facility.User) {
+			fSeverity = severity;
+			fFacility = facility;
+		}
 		
 		~this() {}
 		
+		void setSeverity(Severity severity) {
+			fSeverity = severity;
+		}
+		
+		Severity severity() {
+			return fSeverity;
+		}
+		
+		void setFacility(Facility facility) {
+			fFacility = facility;
+		}
+		
+		Facility facility() {
+			return fFacility;
+		}
+		
 		abstract void log(Log.Record record);
+		
+	}
 		
 }
 
@@ -252,7 +299,9 @@ class ConsoleLogWriter : LogWriter {
 	}
 	
 	override public void log(Log.Record record) {
-		recordToString(record).writeln;
+		if(shouldLog(record)) {
+			recordToString(record).writeln;
+		}
 	}
 	
 }
