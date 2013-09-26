@@ -6,7 +6,7 @@ import std.array;
 
 class Logger {
 
-	public:
+	public {
 	
 		enum Facility {
 			Kernel,
@@ -77,6 +77,8 @@ class Logger {
 				
 			}
 		}
+		
+	}
 	
 	private {
 	
@@ -316,6 +318,10 @@ class LogWriter {
 }
 
 class ConsoleLogWriter : LogWriter {
+
+	this() {
+		super();
+	}
 
 	this(Logger.Severity severity, Logger.Facility facility = Logger.Facility.User) {
 		super(severity, facility);
