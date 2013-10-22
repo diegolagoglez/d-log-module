@@ -84,6 +84,8 @@ class Logger {
 	
 	private {
 	
+		bool			fEnabled = true;
+	
 		LogWriter[]		fWriters;
 		
 		Severity		fSeverity = Severity.Debug;
@@ -124,6 +126,16 @@ class Logger {
 		}
 		
 		~this() {}
+		
+		@property
+		bool enabled() {
+			return fEnabled;
+		}
+		
+		@property
+		void enabled(bool enable) {
+			fEnabled = enable;
+		}
 		
 		void addLogWriter(LogWriter writer) {
 			if(writer !is null) {

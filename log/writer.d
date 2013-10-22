@@ -4,6 +4,7 @@ import log.logger;
 
 class LogWriter {
 
+	private		bool			fEnabled			= true;
 	private		bool			fUseParentSeverity	= true;
 	private		Logger			fParentLogger		= null;
 	
@@ -56,6 +57,16 @@ class LogWriter {
 		}
 		
 		~this() {}
+		
+		@property
+		bool enabled() {
+			return fEnabled;
+		}
+		
+		@property
+		void enabled(bool enable) {
+			fEnabled = enable;
+		}
 		
 		void setSeverity(Logger.Severity severity) {
 			fSeverity = severity;
