@@ -49,6 +49,8 @@ class Logger {
 			Trace
 		}
 	
+		// FIXME I think Record class is not necessary to allow lazy evaluation
+		// of string message through different enabled/disabled writers.
 		class Record {
 		
 			private {
@@ -99,6 +101,7 @@ class Logger {
 	private {
 	
 		bool			fEnabled = true;
+		string			fChannel;
 	
 		LogWriter[]		fWriters;
 		
@@ -172,6 +175,11 @@ class Logger {
 		
 		Facility facility() {
 			return fFacility;
+		}
+		
+		ref Logger channel(string channel) {
+			fChannel = channel;
+			return this;
 		}
 		
 		void emergency(string)(lazy string message) {
