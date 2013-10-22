@@ -52,6 +52,7 @@ class Logger {
 		class Record {
 		
 			private {
+				string		fChannel;
 				string		fMessage;
 				Severity	fSeverity;
 				Facility	fFacility;
@@ -59,10 +60,23 @@ class Logger {
 			
 			public {
 			
+				// FIXME Is really needed lazy on message parameter or it should be controlled before?
 				this(lazy string message, Severity severity, Facility facility) {
 					this.fMessage = message;
 					this.fSeverity = severity;
 					this.fFacility = facility;
+				}
+				
+				// ditto
+				this(lazy string channel, lazy string message, Severity severity, Facility facility) {
+					this.fChannel = channel;
+					this.fMessage = message;
+					this.fSeverity = severity;
+					this.fFacility = facility;
+				}
+				
+				string channel() {
+					return fChannel;
 				}
 				
 				string message() {
