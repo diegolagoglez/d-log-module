@@ -92,20 +92,20 @@ class Logger {
 		Facility		fFacility = Facility.User;
 		
 		// TODO Parametter constness attributes.
-		bool shouldLog(Logger.Record record, LogWriter writer) {
-			return !writer.useParentSeverity() || record.severity() <= fSeverity;
-		}
-		
-		void writeRecord(Record record) {
-			foreach(writer; fWriters) {
-				if(shouldLog(record, writer)) {
-					writer.log(record);
-				}
-			}
+		bool shouldLog(Severity recordSeverity, LogWriter writer) {
+			return !writer.useParentSeverity() || recordSeverity <= fSeverity;
 		}
 		
 		void log(lazy string message, Severity severity) {
-			writeRecord(new Record(message, severity, this.fFacility));
+			if(fEnabled) {
+				foreach(writer; fWriters) {
+					if(writer.enabled) {
+						if(shouldLog(severity, writer)) {
+							writer.log(new Record(message, severity, fFacility));
+						}
+					}
+				}
+			}
 		}
 		
 		string buildMessage(Args...)(lazy Args args) {
